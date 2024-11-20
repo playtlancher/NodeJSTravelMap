@@ -1,9 +1,11 @@
-const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcrypt');
-const User = require('../config/db').users;
+import LocalStrategy from 'passport-local'
+import bcrypt from 'bcrypt';
+import * as db from '../config/db.js'
+
+const users = db.users;
 
 async function authenticateUser(username, password, done) {
-    const user = await User.findOne({where: { username }});
+    const user = await users.findOne({where: {username}});
     if (user == null) {
         return done(null, false, {message: 'User not found'});
     }
@@ -18,9 +20,9 @@ async function authenticateUser(username, password, done) {
     }
 }
 
-module.exports = function initialize(passport) {
+function initialize(passport) {
     passport.use(new LocalStrategy(
-        { usernameField: 'username', passwordField: 'password' },
+        {usernameField: 'username', passwordField: 'password'},
         authenticateUser
     ));
 
@@ -30,7 +32,7 @@ module.exports = function initialize(passport) {
 
     passport.deserializeUser(async (id, done) => {
         try {
-            const user = await User.findOne({ where: { id } });
+            const user = await users.findOne({where: {id}});
             if (!user) {
                 return done(new Error('User not found'));
             }
@@ -39,4 +41,5 @@ module.exports = function initialize(passport) {
             done(err);
         }
     });
-};
+}
+export default initialize;

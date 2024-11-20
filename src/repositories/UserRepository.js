@@ -29,6 +29,9 @@ async function createUser(username, password) {
         return { success: false, message: "Error creating user" };
     }
 }
+async function findByUsername(username) {
+    return await users.findOne({where: { username }});
+}
 
 async function authenticateUser(req, res, next) {
     return await passport.authenticate('local', (err, user, info) => {
@@ -38,15 +41,14 @@ async function authenticateUser(req, res, next) {
         if (!user) {
             return res.redirect('/login');
         }
-
         req.logIn(user, (err) => {
             if (err) {
                 return next(err);
             }
-            res.redirect('/');
+            res.redirect('/routes');
         });
     })(req, res, next);
 }
 
 
-export { createUser, authenticateUser };
+export { createUser, authenticateUser, findByUsername };
